@@ -4,22 +4,34 @@
 using namespace std;
 
 samples::
-samples(double _sample_time):
+samples(const double & _sample_time):
 	sample_time (_sample_time){}
 
 samples::
 samples():
 	sample_time(0){}
 
-const double
+void
 samples::
-get_sample_time(){
+set_sample_time(const double & v){
+	sample_time = v;
+}
+
+samples::
+samples(const double & _sample_time, int window_size){
+    sample_time = _sample_time;
+	sample.resize(window_size);
+}
+
+double
+samples::
+get_sample_time() const{
 	return sample_time;
 }
 
 double
 samples::
-mean(){
+mean() const{
 	double sum = 0;
 	int cnt=sample.size();
     for(int i=0; i<cnt; i++){
@@ -30,7 +42,7 @@ mean(){
 
 double
 samples::
-raw_moment(const int level){
+raw_moment(const int level) const{
 	double sum = 0;
 	int cnt=sample.size();
 	for(int i=0; i<cnt; i++){
@@ -41,7 +53,7 @@ raw_moment(const int level){
 
 double
 samples::
-_deviation(){
+_deviation() const{
 	double sum = 0;
 	int cnt=sample.size();
     for(int i=0; i<cnt; i++){
@@ -52,14 +64,20 @@ _deviation(){
 
 double
 samples::
-deviation(){
+deviation() const{
 	int cnt=sample.size();
     return _deviation()*cnt/(cnt-1);
 }
 
+unsigned int
+samples::
+get_sample_count() const{
+	return sample.size();
+}
+
 double
 samples::
-_central_moment4(){
+_central_moment4() const{
 	double sum = 0;
 	double m = mean();
     int cnt=sample.size();
@@ -71,7 +89,7 @@ _central_moment4(){
 
 double
 samples::
-excess(){
+excess() const{
 	int n = sample.size();	
 	double a = (pow(n,2)-1)/(n-2)/(n-3);
 	double b = _central_moment4()/pow(_deviation(),2) + ((double)6)/(n+1) - 3.0;
@@ -80,7 +98,7 @@ excess(){
 
 double
 samples::
-energy(){
+energy() const{
 	if( !sample_time ){
 		cout << "Can't calculate energy. Sample time is not set.";
 		return 0;
@@ -101,13 +119,59 @@ set(const vector<double> & data_samples){
 
 void
 samples::
-print(){
-	cout << endl;
+add(double s){
+	sample.push_back(s);
+}
+
+void
+samples::
+set_window_size(int n){
+	sample.resize(n);
+}
+
+samples&
+samples::
+operator=(const samples & right){
+	sample_time = right.sample_time;
+	sample = right.sample;
+	return *this;	
+}
+
+samples
+samples::
+operator+(const samples & second) const{
+	int f = sample.size();
+    int s = second.sample.size();
+	if(f>s){
+		samples result = *this;
+		for(int i=0; i<s; i++)
+			result.sample[i] += second.sample[i];
+		return result;
+		}
+	else{
+		samples result = second;
+		for(int i=0; i<f; i++)
+            result.sample[i] += sample[i];
+		return result;
+	}
+}
+
+void
+samples::
+print() const{
+	double max = -1e6, min = 1e6;
+	for(int i=0, cnt=sample.size(); i<cnt; i++){
+		double v = sample.at(i);
+		if(v>max) max = v;
+		if(v<min) min = v;
+	}
+	cout << "Samples: " << sample.size() << endl;
     cout << "Mean: " << mean() << endl;
+	cout << "Max: " << max << endl;
+	cout << "Min: " << min << endl;
     cout << "Deviation: " << deviation() << endl;
     cout << "Excess: " << excess() << endl;
     cout << "Energy: " << energy() << endl;
-	cout << endl;
 }
 
 double
@@ -125,4 +189,9 @@ cross_correlation_0(samples X, samples Y){
         sum += X.sample[i]*Y.sample[i];
     }
     return sum*sample_time;
+}
+
+double
+treshold(double F, double sigma){
+	return sqrt(2) * sigma * boost::math::erf_inv(1-2*F);
 }

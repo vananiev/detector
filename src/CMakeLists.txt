@@ -13,9 +13,10 @@ set (MAIN_SOURCES
     )
 
 # непубличные пары исходников (.cpp, .h)
-set (PRIVATE_CLASSES
+set (PAIR_SOURCES
 	noise_generator
 	core
+	detection_table
     )
 
 # файлы только заголовочные, у которых нет пары-исходника
@@ -23,31 +24,22 @@ SET (HEADERS_ONLY
             
     )
 
-# публичные исходники
-set (PUBLIC_CLASSES)
-
 # используемые в программе библиотеки
 set (ADDITIONAL_LIBRARIES
-    stdc++
-    pthread
+#    stdc++
+#    pthread
     )
 
 set (PUBLIC_HEADERS)
 set (SOURCES)
 
-foreach (class ${PRIVATE_CLASSES})
+foreach (class ${PAIR_SOURCES})
     LIST (APPEND SOURCES ${class}.cpp)
     LIST (APPEND HEADERS ${class}.h)
 endforeach ()
 
 foreach (class ${HEADERS_ONLY})
     LIST (APPEND HEADERS ${class}.h)
-endforeach ()
-    
-foreach (class ${PUBLIC_CLASSES})
-    LIST (APPEND SOURCES ${class}.cpp)
-    LIST (APPEND HEADERS ../include/${PROJECT}/${class}.h)
-    LIST (APPEND PUBLIC_HEADERS ../include/${PROJECT}/${class}.h)
 endforeach ()
 
 add_executable (${PROJECT} ${MAIN_SOURCES} ${SOURCES})

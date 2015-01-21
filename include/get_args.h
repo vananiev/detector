@@ -1,10 +1,11 @@
 #include <fstream>
 #include <iostream>
+#include "core.h"
 
 using namespace std;
 
-vector<double> get_signal(char * filename){
-	vector<double> signal;
+samples get_signal(char * filename){
+	samples signal;
 	
 	ifstream in(filename);
     if(!in){
@@ -13,7 +14,7 @@ vector<double> get_signal(char * filename){
     }
     double s;
 	while(in >> s){
-		signal.push_back(s);
+		signal.add(s);
 	}
 	in.close();
 	return signal;
