@@ -1,0 +1,9 @@
+To build:
+- yum install cmake
+- cd build
+- cmake ..
+- make
+
+To run:
+bin/detector 1e-7 301 1100 signal.txt
+

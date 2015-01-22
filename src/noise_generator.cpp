@@ -24,3 +24,9 @@ noise_generator::
 set_sigma(const double & sigma){
 	distribution =  boost::normal_distribution<double>(distribution.mean(), sigma);
 }
+
+double
+noise_generator::
+sigma() const{
+	return distribution.sigma();
+}

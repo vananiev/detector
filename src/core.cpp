@@ -71,7 +71,7 @@ deviation() const{
 
 unsigned int
 samples::
-get_sample_count() const{
+window_size() const{
 	return sample.size();
 }
 
@@ -166,6 +166,7 @@ print() const{
 		if(v<min) min = v;
 	}
 	cout << "Samples: " << sample.size() << endl;
+	cout << "Duration: " << duration() << endl;
     cout << "Mean: " << mean() << endl;
 	cout << "Max: " << max << endl;
 	cout << "Min: " << min << endl;
@@ -175,17 +176,23 @@ print() const{
 }
 
 double
-cross_correlation_0(samples X, samples Y){
+samples::
+duration() const{
+	return sample_time * (sample.size()-1);
+}
+
+double
+cross_correlation_0(const samples & X, const samples & Y){
 	double sample_time = X.get_sample_time();
 	if( sample_time == 0 || Y.get_sample_time() != sample_time ){
         cout << "Can't calculate cross_correlation(0) . Sample time is not set or X, Y sample times different.";
         return 0;
     }
 	double sum = 0;
-	int n = X.sample.size();
-	int m = Y.sample.size();
+	int n = X.window_size();
+    int m = Y.window_size();
     int cnt = (n<m)?n:m;
-    for(int i=0; i<cnt; i++){
+	for(int i=0; i<cnt; i++){
         sum += X.sample[i]*Y.sample[i];
     }
     return sum*sample_time;

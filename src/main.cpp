@@ -21,19 +21,25 @@ int main(int argc, char * argv[])
 	cout << endl;
 
 	cout << "Expect-noise deviation, Volt: " << info.expected_noise_sigma() << endl;
-	cout << "Window size in samples: " << info.window_size() << endl;
+	cout << "Window size, samples: " << info.window_size() << endl;
+	double window_duration = info.sample_time()*(info.window_size()-1);
+	cout << "Window size, seconds: " << window_duration << endl;
 	cout << endl;
 
 	calculate_tresholds (info.expected_noise_sigma());
 	cout << "Excess treshold e0, o.e.: " << info.e0() << endl;
-	cout << "Energy treshold E0, Joule: " << info.E0() << endl;
+	cout << "Cross-correlation treshold z0, Volt^2*sec: " << info.z0() << endl;
+	//cout << "Maxinum-noise deviation for energy detector, Volt: " << sqrt(info.z0() / window_duration) << endl;
 	cout << endl;	
 
 	cout << "Calculate table..." << endl;
 	vector<double> q;
-	q.resize(200);
-	for(int i=0, cnt=q.size(); i<cnt; i++)
-		q[i] = 0.01 * (i+1);
+	double start=1e-4;
+	q.push_back(0);
+	q.push_back(start);
+	for(int i=0; i<50; i++){
+		q.push_back(q[i+1] + start*pow(10,i/9));
+	}
 	detection_table table( q, info.signal());
 	table.calculate(info);
 	table.print();
@@ -73,10 +79,11 @@ void calculate_tresholds(const double & noise_sigma){
     double F = 1 * info.window_size() * info.sample_time() / (24*3600*365);
 
 	cout << "Deviation of expected-noise excess, o.e.: " << sigma_e << endl;
-	cout << "Deviation of expected_noise-to-signal cross corelation (t=0), Joule: " << sigma_z << endl;
+	cout << "Deviation of expected_noise-to-signal cross corelation, Volt^2*sec: " << sigma_z << endl;
+	cout << "Count of false work in 1 year: " << 1 << endl;
 	cout << "Probability of false work in one sampling window, o.e.: " << F << endl;
 
 	info.set_e0 ( treshold(F, sigma_e) );
-    info.set_E0 ( treshold(F, sigma_z) );
+    info.set_z0 ( treshold(F, sigma_z) );
 }
 

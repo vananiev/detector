@@ -21,6 +21,7 @@ class noise_generator
 	~noise_generator();
   	void generate_to (samples & noise);
 	void set_sigma(const double & sigma);
+	double sigma() const;
 };
 
 #endif

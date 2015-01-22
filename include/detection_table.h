@@ -14,7 +14,7 @@ class detection_table{
 
     public:
     vector<double> Pe;
-    vector<double> PE;
+    vector<double> Pz;
 	
 	detection_table(vector<double> & q, samples signal);
     void calculate(const variables & info);
